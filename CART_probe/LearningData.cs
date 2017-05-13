@@ -122,9 +122,12 @@ namespace CART_probe
 
         public Tree CART(int[] indexes /*, List<int> usedRules*/) // indexes - массив индексов примеров в instances для данного узла
         {
-            double kL = 0f, kR = 0f;
-            double[] kjL = new double[classes.Count()];
-            double[] kjR = new double[classes.Count()];
+            int kL = 0, kR = 0;
+            int[] kjL = new int[classes.Count()];
+            int[] kjR = new int[classes.Count()];
+            double pL = 0, pR = 0;
+            double[] pjL = new double[classes.Count()];
+            double[] pjR = new double[classes.Count()];
             double[] giniTable = new double[potentialRules.Count];
             int indexOfCurrentAtribute = 0;
             List<int> indexesOfLeftInstances = new List<int>();
@@ -133,7 +136,7 @@ namespace CART_probe
             if (indexes == null)
             {
                 indexes = new int[instances.Count];
-                for (int q = 0; q < indexes.Count(); q++)
+                for (int q = 0; q < indexes.Length; q++)
                     indexes[q] = q;
             }
 
@@ -154,13 +157,13 @@ namespace CART_probe
                     if (usedRules.Contains(i))
                         continue;
 
-                    for (int k = 0; k < atributes.Count(); k++)
+                    for (int k = 0; k < atributes.Length; k++)
                     {
                         if (potentialRules[i].b.atrName.Equals(atributes[k]))
                             indexOfCurrentAtribute = k;
                     }
 
-                    for (int j = 0; j < indexes.Count(); j++)
+                    for (int j = 0; j < indexes.Length; j++)
                     {
                         if (potentialRules[i].b.textAtr == null) // Если параметр непрерывный, то сравниваем (НАДО ДОПИСАТЬ!)
                         {
@@ -185,10 +188,25 @@ namespace CART_probe
                         }
                     }
                     kR = instances.Count - kL;
-                    giniTable[i] = CalculateGini(kL, kR, kjL, kjR);
-                    kL = 0; kR = 0;
+                    pL = (double) kL / indexes.Length;
+                    pR = 1 - pL;
+                    for (int j = 0; j < pjL.Length; j++)
+                    {
+                        if (kL == 0)
+                            pjL[j] = 0;
+                        else
+                            pjL[j] = (double) kjL[j] / kL;
+                        if (kR == 0)
+                            pjR[j] = 0;
+                        else
+                            pjR[j] = (double) kjR[j] / kR;
+                    }
+                    giniTable[i] = CalculateGini(pL, pR, pjL, pjR);
+                    kL = 0; kR = 0; pL = 0; pR = 0;
                     Array.Clear(kjL, 0, kjL.Length);
                     Array.Clear(kjR, 0, kjR.Length);
+                    Array.Clear(pjL, 0, pjL.Length);
+                    Array.Clear(pjR, 0, pjR.Length);
                 }
                 var indexOfRule = FindMax(giniTable); // Берем индекс самого лучшего правила из табицы ГИНИ
                 usedRules.Add(indexOfRule);
@@ -200,28 +218,56 @@ namespace CART_probe
                     else
                         indexesOfRightInstances.Add(indexes[i]);
                 }
-                tree.leftChild = CART(indexesOfLeftInstances.ToArray()/*, usedRules*/);
-                tree.rightChild = CART(indexesOfRightInstances.ToArray()/*, usedRules*/);
-                return tree;
+                if(indexesOfLeftInstances.Count == 0)
+                {
+                    tree.isTerminate = true;
+                    tree.rule = new Rule(new Atribute(null, FindPrevailClass(indexesOfLeftInstances.ToArray()), 0));
+                    return tree;
+                }
+                else
+                {
+                    if (indexesOfRightInstances.Count == 0)
+                    {
+                        tree.isTerminate = true;
+                        tree.rule = new Rule(new Atribute(null, FindPrevailClass(indexesOfRightInstances.ToArray()), 0));
+                        return tree;
+                    }
+                    else
+                    {
+                        tree.leftChild = CART(indexesOfLeftInstances.ToArray()/*, usedRules*/);
+                        tree.rightChild = CART(indexesOfRightInstances.ToArray()/*, usedRules*/);
+                        return tree;
+                    }
+                }
             }
         }
 
 
 
-        public double CalculateGini(double kl, double kr, double[] kjl, double[] kjr)
+        /* public double CalculateGini(double pl, double pr, double[] pjl, double[] pjr)
         {
             double leftSumm = 0f;
             double rightSumm = 0f;
-            var inverseKL = 1 / kl;
-            var inverseKR = 1 / kr;
+            var inverseKL = 1 / pl;
+            var inverseKR = 1 / pr;
 
-            foreach (var item in kjl)
+            foreach (var item in pjl)
                 leftSumm += Math.Pow(item, 2);
-            foreach (var item in kjr)
+            foreach (var item in pjr)
                 rightSumm += Math.Pow(item, 2);
 
             var result = inverseKL * leftSumm + inverseKR * rightSumm;
             return result;
+        } */
+
+        public double CalculateGini(double pl, double pr, double[] pjl, double[] pjr)
+        {
+            double summ = 0;
+
+            for (int i = 0; i < pjl.Count(); i++)
+                summ += Math.Abs((pjl[i] - pjr[i]));
+
+            return (2 * pl * pr * summ);
         }
 
         public int FindMax(double[] array)
@@ -245,6 +291,15 @@ namespace CART_probe
             return true;
         }
 
-        
+        public string FindPrevailClass(int[] indexes)
+        {
+            int[] classesIndexes = new int[classes.Count()];
+            for (int i = 0; i < indexes.Count(); i++)
+            {
+                var index = Array.IndexOf(classes, instances[indexes[i]].instanceClass);
+                classesIndexes[index]++;
+            }
+            return classes[classesIndexes.Max()];
+        }
     }
 }

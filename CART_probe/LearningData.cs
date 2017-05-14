@@ -14,6 +14,7 @@ namespace CART_probe
         private List<int> usedRules = new List<int>();
         private string[] atributes;
         private string[] classes;
+        private List<Atribute> atr_values;
 
         private List<Instance> instances;
 
@@ -21,6 +22,7 @@ namespace CART_probe
         {
             instances = new List<Instance>();
             potentialRules = new List<Rule>();
+            atr_values = new List<Atribute>();
             atributes = atrs;
             classes = clss;
             InitializeData(path);
@@ -43,6 +45,7 @@ namespace CART_probe
                 do
                 {
                     var instance = new Instance(atributeCount);
+                    
                     string atribute = null;
                     char singleSymbol = '\0';
                     for (int i = 0, j = 0; i < arr.Length; i++)
@@ -61,9 +64,28 @@ namespace CART_probe
                             {
                                 atribute.Replace(" ", "");
                                 instance.atributes[j].textAtr = atribute;
-                                instance.atributes[j].atrName = atributes[j];
-                                j++;
+                                instance.atributes[j].atrName = atributes[j];                                
+                                //собираем все возможные значения категориальных атрибутов
+                                int a = 0;
+                                bool exist = false;
+                                while (a < atr_values.Count && !exist)
+                                {
+                                    if (atr_values[a].atrName.Equals(atributes[j]) && atr_values[a].textAtr.Equals(atribute))
+                                    {
+                                        exist = true;
+                                    }
+                                    else
+                                    {
+                                        a++;
+                                    }
+                                }                                
+                                if (!exist || atr_values.Count == 0)
+                                {
+                                    var art_val = new Atribute(atributes[j], atribute, 0);
+                                    atr_values.Add(art_val);
+                                }                                    
                                 atribute = null;
+                                j++;
                             }
                             else
                                 atribute += singleSymbol;

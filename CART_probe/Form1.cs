@@ -15,7 +15,7 @@ namespace CART_probe
         LearningData data;
         string[] atributes1 = new string[] { "buing", "maint", "doors", "persons", "lug_boot", "safety" };
         string[] classes1;
-        string path1 = @"C:\\Users\\пк\\Desktop\\Магистратура\\Магистратура 2 сем\\ИАД\\3 задание (вторая работа)\\car.txt";
+        string path1 = @"car.txt";
 
         public Form1()
         {

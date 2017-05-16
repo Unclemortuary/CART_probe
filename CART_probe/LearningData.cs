@@ -9,16 +9,20 @@ namespace CART_probe
 {
     class LearningData
     {
+        public static LearningData Instance;
+
         public static List<Rule> potentialRules; // Набор потенциальных рабиений
+        public List<Instance> instances;
 
         private List<int> usedRules = new List<int>();
         private string[] atributes;
         private string[] classes;
 
-        private List<Instance> instances;
 
         public LearningData(string path, string[] clss, string[] atrs)
         {
+            if (Instance == null)
+                Instance = this;
             instances = new List<Instance>();
             potentialRules = new List<Rule>();
             atributes = atrs;
@@ -45,7 +49,7 @@ namespace CART_probe
                     var instance = new Instance(atributeCount);
                     string atribute = null;
                     char singleSymbol = '\0';
-                    for (int i = 0, j = 0; i < arr.Length; i++)
+                    for (int i = 0, j = 0; i < arr.Length; i++) // Проходим по строчке, забирая атрибуты и название класса
                     {
                         singleSymbol = arr[i];
                         if (i == arr.Length - 1) // Последний атрибут в строке - класс
@@ -221,7 +225,7 @@ namespace CART_probe
                 if(indexesOfLeftInstances.Count == 0)
                 {
                     tree.isTerminate = true;
-                    tree.rule = new Rule(new Atribute(null, FindPrevailClass(indexesOfLeftInstances.ToArray()), 0));
+                    tree.rule = new Rule(new Atribute(null, FindPrevailClass(indexesOfRightInstances.ToArray()), 0));
                     return tree;
                 }
                 else
@@ -229,7 +233,7 @@ namespace CART_probe
                     if (indexesOfRightInstances.Count == 0)
                     {
                         tree.isTerminate = true;
-                        tree.rule = new Rule(new Atribute(null, FindPrevailClass(indexesOfRightInstances.ToArray()), 0));
+                        tree.rule = new Rule(new Atribute(null, FindPrevailClass(indexesOfLeftInstances.ToArray()), 0));
                         return tree;
                     }
                     else
@@ -241,24 +245,6 @@ namespace CART_probe
                 }
             }
         }
-
-
-
-        /* public double CalculateGini(double pl, double pr, double[] pjl, double[] pjr)
-        {
-            double leftSumm = 0f;
-            double rightSumm = 0f;
-            var inverseKL = 1 / pl;
-            var inverseKR = 1 / pr;
-
-            foreach (var item in pjl)
-                leftSumm += Math.Pow(item, 2);
-            foreach (var item in pjr)
-                rightSumm += Math.Pow(item, 2);
-
-            var result = inverseKL * leftSumm + inverseKR * rightSumm;
-            return result;
-        } */
 
         public double CalculateGini(double pl, double pr, double[] pjl, double[] pjr)
         {
@@ -299,7 +285,8 @@ namespace CART_probe
                 var index = Array.IndexOf(classes, instances[indexes[i]].instanceClass);
                 classesIndexes[index]++;
             }
-            return classes[classesIndexes.Max()];
+            var finalIndex = Array.IndexOf(classesIndexes ,classesIndexes.Max());
+            return classes[finalIndex];
         }
     }
 }

@@ -21,11 +21,15 @@ namespace CART_probe
         {
             InitializeComponent();
             classes1 = new string[] { "unacc", "acc", "good", "vgood" };
-            data = new LearningData(path1, classes1, atributes1);
-            var used = new List<int>(data.GetCountOfRules());
-            Tree finalTree = data.CART(null);
         }
 
 
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            data = new LearningData(path1, classes1, atributes1);
+            var used = new List<int>(data.GetCountOfRules());
+            Tree finalTree = data.CART(null);
+            textBox1.SelectionStart = 0;
+        }
     }
 }

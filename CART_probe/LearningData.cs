@@ -11,22 +11,20 @@ namespace CART_probe
     {
         public static LearningData Instance;
 
-        public static List<Rule> potentialRules; // Набор потенциальных рабиений
+        
         public List<Instance> instances;
-
+        private RulesForData rulesForData;
         private List<int> usedRules = new List<int>();
         private string[] atributes;
         private string[] classes;
-        private List<Atribute> atr_values;
+        
 
 
         public LearningData(string path, string[] clss, string[] atrs)
         {
             if (Instance == null)
                 Instance = this;
-            instances = new List<Instance>();
-            potentialRules = new List<Rule>();
-            atr_values = new List<Atribute>();
+            instances = new List<Instance>();            
             atributes = atrs;
             classes = clss;
             InitializeData(path);
@@ -68,26 +66,8 @@ namespace CART_probe
                             {
                                 atribute.Replace(" ", "");
                                 instance.atributes[j].textAtr = atribute;
-                                instance.atributes[j].atrName = atributes[j];                                
-                                //собираем все возможные значения категориальных атрибутов
-                                int a = 0;
-                                bool exist = false;
-                                while (a < atr_values.Count && !exist)
-                                {
-                                    if (atr_values[a].atrName.Equals(atributes[j]) && atr_values[a].textAtr.Equals(atribute))
-                                    {
-                                        exist = true;
-                                    }
-                                    else
-                                    {
-                                        a++;
-                                    }
-                                }                                
-                                if (!exist || atr_values.Count == 0)
-                                {
-                                    var art_val = new Atribute(atributes[j], atribute, 0);
-                                    atr_values.Add(art_val);
-                                }                                    
+                                instance.atributes[j].atrName = atributes[j];
+                                rulesForData.AddNewAtr(atributes[j], atribute);
                                 atribute = null;
                                 j++;
                             }
@@ -110,6 +90,7 @@ namespace CART_probe
 
         public void MakePotentialRules(List<Instance> list)
         {
+            int numericAtrCount = 0;
             // Проверяем на числовые атрибуты, если имеются - сортируем и добавляем разбиения
             for (int i = 0; i < list[0].atributes.Count(); i++)
             {
@@ -117,6 +98,7 @@ namespace CART_probe
                 {
                     ColumnSorting(i);
                     MakeRuleForNumericAtr();
+                    numericAtrCount++;
                 }
             }
             // Добавляем разбиения для строковых атрибутов
@@ -127,6 +109,31 @@ namespace CART_probe
                     var someRule = new Rule(list[i].atributes[j]);
                     if (!potentialRules.Contains(someRule))
                         potentialRules.Add(someRule);
+                }
+            }
+        }
+
+        public static IEnumerable<int[]> Combinations(int m, int n)
+        {
+            int[] result = new int[m];
+            Stack<int> stack = new Stack<int>();
+            stack.Push(0);
+
+            while (stack.Count > 0)
+            {
+                int index = stack.Count - 1;
+                int value = stack.Pop();
+
+                while (value < n)
+                {
+                    result[index++] = ++value;
+                    stack.Push(value);
+
+                    if (index == m)
+                    {
+                        yield return result;
+                        break;
+                    }
                 }
             }
         }

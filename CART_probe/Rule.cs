@@ -11,8 +11,6 @@ namespace CART_probe
         public string rule;
         public  Atribute b;
 
-        //private List<int> indexesOfLeftChilds;
-        //private List<int> indexesOfRightChilds;
 
         public Rule(Atribute someAtr)
         {

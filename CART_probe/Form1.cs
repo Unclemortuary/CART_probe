@@ -29,7 +29,54 @@ namespace CART_probe
             data = new LearningData(path1, classes1, atributes1);
             var used = new List<int>(data.GetCountOfRules());
             Tree finalTree = data.CART(null);
+            PrintTree(finalTree, 50);
             textBox1.SelectionStart = 0;
+        }
+
+        private void PrintTree(Tree tree, int indent)
+        {
+            int fixIndent = 10;
+            Stack<Tree> lvlStack = new Stack<Tree>();
+            Stack<Tree> tmpLvlStack = new Stack<Tree>();
+            Tree tmpTree;
+            lvlStack.Push(tree);
+            bool end = false;
+            while(!end)
+            {
+                tmpTree = lvlStack.Pop();
+                tmpLvlStack.Push(tmpTree.leftChild);
+                tmpLvlStack.Push(tmpTree.rightChild);
+                if (lvlStack.Count == 0)
+                {
+                    PrintNode(tmpTree, indent);
+                    end = true;
+                    textBox1.Text += Environment.NewLine;
+                    indent -= 5;
+                    do
+                    {
+                        lvlStack.Push(tmpTree);
+                        tmpTree = tmpLvlStack.Pop();
+                        if (tmpTree != null)
+                            end = false;
+                    } while (tmpLvlStack.Count != 0);
+                }
+                else
+                    PrintNode(tmpTree, fixIndent);
+            }
+        }
+
+        private void PrintNode(Tree tree, int indent)
+        {
+            int k = 0;
+            
+            for (int i = 0; i < k; i++)
+            {
+                textBox1.Text += "  ";
+            }
+            if (tree == null)
+                textBox1.Text += "      ";
+            else
+                textBox1.Text += tree.rule;
         }
     }
 }

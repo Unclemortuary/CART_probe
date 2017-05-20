@@ -9,10 +9,10 @@ namespace CART_probe
     class Rule : IEquatable<Rule>
     {
         public string rule;
-        public  Atribute b;
+        public  List<Atribute> b;
 
 
-        public Rule(Atribute someAtr)
+        public Rule(List<Atribute> someAtr)
         {
             b = someAtr;
             rule = WriteRule();
@@ -20,15 +20,21 @@ namespace CART_probe
 
         public string WriteRule()
         {
-            if (b.atrName != null)
-            {
-                if (b.textAtr != null)
-                    return b.atrName + " is " + b.textAtr + "?";
-                else
-                    return b.atrName + " <= " + b.intAtr.ToString() + "?";
-            }
+            string str;
+            str = b[0].atrName;
+            if (b[0].textAtr != null)
+                str += " is ";
             else
-                return b.textAtr;
+                str += " <= ";
+            for (int i = 0; i < b.Count; i++)
+            {
+                    if (b[i].textAtr != null)
+                        str += b[i].textAtr + " ";
+                    else
+                        str += b[i].intAtr.ToString() + " ";
+            }
+            str += "?";
+            return str;
         }
 
         public bool Equals(Rule other)

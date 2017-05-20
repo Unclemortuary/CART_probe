@@ -27,8 +27,9 @@ namespace CART_probe
             instances = new List<Instance>();            
             atributes = atrs;
             classes = clss;
+            rulesForData = new RulesForData(atrs);
             InitializeData(path);
-            MakePotentialRules(instances);
+            rulesForData.MakePotentialsRules();
         }
 
         public void InitializeData(string p)
@@ -67,7 +68,7 @@ namespace CART_probe
                                 atribute.Replace(" ", "");
                                 instance.atributes[j].textAtr = atribute;
                                 instance.atributes[j].atrName = atributes[j];
-                                rulesForData.AddNewAtr(atributes[j], atribute);
+                                rulesForData.AddNewAtr(j, atribute);
                                 atribute = null;
                                 j++;
                             }
@@ -106,9 +107,9 @@ namespace CART_probe
             {
                 for (int j = 0; j < list[i].atributes.Count(); j++)
                 {
-                    var someRule = new Rule(list[i].atributes[j]);
-                    if (!potentialRules.Contains(someRule))
-                        potentialRules.Add(someRule);
+                    //var someRule = new Rule(list[i].atributes[j]);
+                    //if (!potentialRules.Contains(someRule))
+                        //potentialRules.Add(someRule);
                 }
             }
         }
@@ -140,7 +141,7 @@ namespace CART_probe
 
         public int GetCountOfRules()
         {
-            return potentialRules.Count;
+            return rulesForData.potentialRules.Count;
         }
 
         public void ColumnSorting(int index)
@@ -161,7 +162,7 @@ namespace CART_probe
             double pL = 0, pR = 0;
             double[] pjL = new double[classes.Count()];
             double[] pjR = new double[classes.Count()];
-            double[] giniTable = new double[potentialRules.Count];
+            double[] giniTable = new double[rulesForData.potentialRules.Count];
             int indexOfCurrentAtribute = 0;
             List<int> indexesOfLeftInstances = new List<int>();
             List<int> indexesOfRightInstances = new List<int>();
@@ -174,51 +175,51 @@ namespace CART_probe
             }
 
             Tree tree = new Tree(indexes);
-            if (IsTerminate(indexes) || usedRules.Count == potentialRules.Count) // Проверяем лист или нет
+            if (IsTerminate(indexes) || usedRules.Count == rulesForData.potentialRules.Count) // Проверяем лист или нет
             {
                 tree.isTerminate = true;
                 var nameOfClass = instances[indexes[0]].instanceClass;
                 // Если да, то создаем правило, которое содержит только название класса
-                tree.rule = new Rule(new Atribute(null, nameOfClass, 0));
+                tree.rule = new Rule(new List<Atribute> { new Atribute(null, nameOfClass, 0) });
                 // И выходим из функции
                 return tree;
             }
             else
             {
-                for (int i = 0; i < potentialRules.Count; i++)
+                for (int i = 0; i < rulesForData.potentialRules.Count; i++)
                 {
                     if (usedRules.Contains(i))
                         continue;
 
-                    for (int k = 0; k < atributes.Length; k++)
-                    {
-                        if (potentialRules[i].b.atrName.Equals(atributes[k]))
-                            indexOfCurrentAtribute = k;
-                    }
+                    //for (int k = 0; k < atributes.Length; k++)
+                    //{
+                    //    if (rulesForData.potentialRules[i].b.atrName.Equals(atributes[k]))
+                    //        indexOfCurrentAtribute = k;
+                    //}
 
                     for (int j = 0; j < indexes.Length; j++)
                     {
-                        if (potentialRules[i].b.textAtr == null) // Если параметр непрерывный, то сравниваем (НАДО ДОПИСАТЬ!)
-                        {
+                        //if (rulesForData.potentialRules[i].b.textAtr == null) // Если параметр непрерывный, то сравниваем (НАДО ДОПИСАТЬ!)
+                        //{
 
-                        }
-                        else
-                        {
-                            if (instances[indexes[j]].atributes[indexOfCurrentAtribute].textAtr.Equals(potentialRules[i].b.textAtr)) // Проверям примеры в левом потомке
-                            {
-                                kL++;
-                                var indexOfClass = Array.IndexOf(classes, instances[indexes[j]].instanceClass); // Берем индекс класса соответсвтующего примера
-                                kjL[indexOfClass]++; // И прибавляем 1 в ячейке массива с такой же размерностью с соответсвующим индексом
-                                // Таким образом подсчитываем кол-во примеров каждого класса в левом потомке
-                                //indexesOfLeftInstances.Add(indexes[j]); // Заносим индекс примера в массив индексов для левого потомка
-                            }
-                            else
-                            {
-                                var indexOfClass = Array.IndexOf(classes, instances[indexes[j]].instanceClass);
-                                kjR[indexOfClass]++;
-                                //indexesOfRightInstances.Add(indexes[j]); // Заносим индекс примера в массив индексов для правого потомка
-                            }
-                        }
+                        //}
+                        //else
+                        //{
+                        //    if (instances[indexes[j]].atributes[indexOfCurrentAtribute].textAtr.Equals(rulesForData.potentialRules[i].b.textAtr)) // Проверям примеры в левом потомке
+                        //    {
+                        //        kL++;
+                        //        var indexOfClass = Array.IndexOf(classes, instances[indexes[j]].instanceClass); // Берем индекс класса соответсвтующего примера
+                        //        kjL[indexOfClass]++; // И прибавляем 1 в ячейке массива с такой же размерностью с соответсвующим индексом
+                        //        // Таким образом подсчитываем кол-во примеров каждого класса в левом потомке
+                        //        //indexesOfLeftInstances.Add(indexes[j]); // Заносим индекс примера в массив индексов для левого потомка
+                        //    }
+                        //    else
+                        //    {
+                        //        var indexOfClass = Array.IndexOf(classes, instances[indexes[j]].instanceClass);
+                        //        kjR[indexOfClass]++;
+                        //        //indexesOfRightInstances.Add(indexes[j]); // Заносим индекс примера в массив индексов для правого потомка
+                        //    }
+                        //}
                     }
                     kR = instances.Count - kL;
                     pL = (double) kL / indexes.Length;
@@ -243,18 +244,18 @@ namespace CART_probe
                 }
                 var indexOfRule = FindMax(giniTable); // Берем индекс самого лучшего правила из табицы ГИНИ
                 usedRules.Add(indexOfRule);
-                tree.rule = potentialRules[indexOfRule]; // и заносим правило с таким индексом в дерево
-                for (int i = 0, ind = Array.IndexOf(atributes, potentialRules[indexOfRule].b.atrName); i < indexes.Count(); i++)
-                {
-                    if (instances[indexes[i]].atributes[ind].textAtr.Equals(potentialRules[indexOfRule].b.textAtr))
-                        indexesOfLeftInstances.Add(indexes[i]);
-                    else
-                        indexesOfRightInstances.Add(indexes[i]);
-                }
+                tree.rule = rulesForData.potentialRules[indexOfRule]; // и заносим правило с таким индексом в дерево
+                //for (int i = 0, ind = Array.IndexOf(atributes, rulesForData.potentialRules[indexOfRule].b.atrName); i < indexes.Count(); i++)
+                //{
+                //    if (instances[indexes[i]].atributes[ind].textAtr.Equals(rulesForData.potentialRules[indexOfRule].b.textAtr))
+                //        indexesOfLeftInstances.Add(indexes[i]);
+                //    else
+                //        indexesOfRightInstances.Add(indexes[i]);
+                //}
                 if(indexesOfLeftInstances.Count == 0)
                 {
                     tree.isTerminate = true;
-                    tree.rule = new Rule(new Atribute(null, FindPrevailClass(indexesOfRightInstances.ToArray()), 0));
+//                    tree.rule = new Rule(new Atribute(null, FindPrevailClass(indexesOfRightInstances.ToArray()), 0));
                     return tree;
                 }
                 else
@@ -262,7 +263,7 @@ namespace CART_probe
                     if (indexesOfRightInstances.Count == 0)
                     {
                         tree.isTerminate = true;
-                        tree.rule = new Rule(new Atribute(null, FindPrevailClass(indexesOfLeftInstances.ToArray()), 0));
+//                        tree.rule = new Rule(new Atribute(null, FindPrevailClass(indexesOfLeftInstances.ToArray()), 0));
                         return tree;
                     }
                     else

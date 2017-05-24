@@ -21,7 +21,7 @@ namespace CART_probe
 
         public bool Equals(Atribute a)
         {
-            if (atrName.Equals(a.atrName))
+            if (atrName.Equals(a.atrName) && textAtr.Equals(a.textAtr))
                 return true;
             else
                 return false;

@@ -4,6 +4,7 @@ using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace CART_probe
 {
@@ -51,8 +52,16 @@ namespace CART_probe
             {
                 var bit_per = new BitArray(atr_values[j].Count);
                 var oneBits = new BitArray(atr_values[j].Count);
-                bit_per.Set(0, true);
-                oneBits.Set(0, true);
+                try
+                {
+                    bit_per.Set(0, true);
+                    oneBits.Set(0, true);
+                }
+                catch(Exception e)
+                {
+                    MessageBox.Show("Exception was occure : " + e.Data.ToString());
+                }
+                
                 while (bit_per.Get(atr_values[j].Count - 1) == false)
                 {
                     //делаем правило из набора атрибутов в соответствии с битовым массивом

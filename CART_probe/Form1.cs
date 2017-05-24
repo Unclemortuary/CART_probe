@@ -28,8 +28,8 @@ namespace CART_probe
         {
             data = new LearningData(path1, classes1, atributes1);
             var used = new List<int>(data.GetCountOfRules());
-            Tree finalTree = data.CART(null);
-            PrintTree(finalTree, 50);
+            Tree finalTree = data.CART(null, used);
+            //PrintTree(finalTree, 50);
             textBox1.SelectionStart = 0;
         }
 

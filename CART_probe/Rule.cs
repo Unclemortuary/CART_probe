@@ -28,10 +28,12 @@ namespace CART_probe
                 str += " <= ";
             for (int i = 0; i < b.Count; i++)
             {
-                    if (b[i].textAtr != null)
-                        str += b[i].textAtr + " ";
-                    else
-                        str += b[i].intAtr.ToString() + " ";
+                if (b[i].textAtr != null)
+                    str += b[i].textAtr + " ";
+                else
+                    str += b[i].intAtr.ToString() + " ";
+                if (b.Count > 1 && i != b.Count - 1)
+                    str += "and ";
             }
             str += "?";
             return str;

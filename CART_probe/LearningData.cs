@@ -89,31 +89,6 @@ namespace CART_probe
             Console.WriteLine("Done!");
         }
 
-        //public void MakePotentialRules(List<Instance> list)
-        //{
-        //    int numericAtrCount = 0;
-        //    // Проверяем на числовые атрибуты, если имеются - сортируем и добавляем разбиения
-        //    for (int i = 0; i < list[0].atributes.Count(); i++)
-        //    {
-        //        if (list[0].atributes[i].textAtr == null)
-        //        {
-        //            ColumnSorting(i);
-        //            MakeRuleForNumericAtr();
-        //            numericAtrCount++;
-        //        }
-        //    }
-        //    // Добавляем разбиения для строковых атрибутов
-        //    for (int i = 0; i < list.Count; i++)
-        //    {
-        //        for (int j = 0; j < list[i].atributes.Count(); j++)
-        //        {
-        //            var someRule = new Rule(list[i].atributes[j]);
-        //            if (!potentialRules.Contains(someRule))
-        //                potentialRules.Add(someRule);
-        //        }
-        //    }
-        //}
-
         public int GetCountOfRules()
         {
             return rulesForData.potentialRules.Count;

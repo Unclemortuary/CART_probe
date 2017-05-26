@@ -33,7 +33,7 @@ namespace CART_probe
                 else
                     str += b[i].intAtr.ToString() + " ";
                 if (b.Count > 1 && i != b.Count - 1)
-                    str += "and ";
+                    str += ", ";
             }
             str += "?";
             return str;

@@ -45,26 +45,27 @@ namespace CART_probe
         private void Walk(Tree tree, int nmb)
         {
             int trL, trR;
-            if (tree.leftChild != null)
-            {
-                trL = NumberTree + 1;
-                NumberTree += 1;
-                contacts.Add(nmb.ToString() + " " + trL.ToString());
-            }
-            else
-            {
-                trL = 0;
-            }
             if (tree.rightChild != null)
             {
                 trR = NumberTree + 1;
                 NumberTree += 1;
-                contacts.Add(nmb.ToString() + " " + trR.ToString());
+                contacts.Add(nmb.ToString() + " " + trR.ToString() + " no");
             }
             else
             {
                 trR = 0;
             }
+            if (tree.leftChild != null)
+            {
+                trL = NumberTree + 1;
+                NumberTree += 1;
+                contacts.Add(nmb.ToString() + " " + trL.ToString() + " yes");
+            }
+            else
+            {
+                trL = 0;
+            }
+
             writer.WriteLine(nmb.ToString() + " " + tree.rule.rule);
             if(trL != 0)
             {

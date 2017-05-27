@@ -29,7 +29,7 @@ namespace CART_probe
         {
             data = new LearningData(path1, classes1, atributes1);
             var used = new List<int>(data.GetCountOfRules());
-            Tree finalTree = data.CART(null, used);
+            Tree finalTree = data.CART(null/*, used*/);
             DisplayTree display_tree = new DisplayTree(finalTree);
             textBox1.SelectionStart = 0;
         }

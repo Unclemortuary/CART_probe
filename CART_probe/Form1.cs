@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Fractions;
 
 
 namespace CART_probe
@@ -17,6 +18,7 @@ namespace CART_probe
         string[] atributes1 = new string[] { "buing", "maint", "doors", "persons", "lug_boot", "safety" };
         string[] classes1;
         string path1 = @"car.txt";
+        List<Fraction> alfa = new List<Fraction>();
 
         public Form1()
         {
@@ -31,7 +33,13 @@ namespace CART_probe
             var used = new List<int>(data.GetCountOfRules());
             Tree finalTree = data.CART(null/*, used*/);
             DisplayTree display_tree = new DisplayTree(finalTree);
+            alfa = finalTree.FindAlfa();
             textBox1.SelectionStart = 0;
+            Fraction a = new Fraction(1000, 104);
+            Fraction b = new Fraction(5, 52);
+            a = a.Divide(5);
+            var result2 = a == b;
+
         }
     }
 }

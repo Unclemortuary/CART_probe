@@ -280,6 +280,7 @@ namespace CART_probe
 
         public string FindPrevailClass(int[] indexes)
         {
+            //!!!!надо при построении эти значения запоминать, а не занаво считать
             int[] classesIndexes = new int[classes.Count()];
             for (int i = 0; i < indexes.Count(); i++)
             {

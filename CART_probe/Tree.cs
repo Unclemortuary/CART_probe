@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Fractions;
 
 namespace CART_probe
 {
@@ -15,76 +16,77 @@ namespace CART_probe
         public bool isTerminate;
 
         private int[] indexesOfData;
-        private double g;
+        private Fraction g;
 
         public Tree(int[] data)
         {
             indexesOfData = data;
         }
 
-        public Tree Cut(string nameOfClass)
+        public List<Fraction> FindAlfa()
         {
-            bool stop = false;
-            do
+            List<Fraction> alfa = new List<Fraction>();
+            while (!isTerminate)
             {
-                double minG = Double.MaxValue;
-                CalculateG(this, indexesOfData.Length, ref minG);
-                stop = Cutting(minG, g);
-            } while (!stop);
-            return this;
+                Fraction minG = new Fraction (Double.MaxValue);
+                CalculateG(indexesOfData.Length, ref minG);
+                Cutting(minG);
+                alfa.Add(minG);
+            } 
+            return alfa;
         }
         
-        private void CalculateG(Tree tree, int count, ref double minG)
+        private void CalculateG(int count, ref Fraction minG)
         {
-            double singleG = 0;
-            double rT = 0, rTt = 0, t1t = 0;
-            rT = CalculateError(tree, count);
-            rTt = CalculateErrorOfBranch(tree, count);
-            t1t = FindCountOfLeafs(tree);
-            singleG = (rT - rTt) / (t1t - 1);
-            if(!tree.isTerminate)
+            Fraction singleG;
+            int rT, rTt, t1t;
+            rT = CalculateError();
+            rTt = CalculateErrorOfBranch();
+            t1t = FindCountOfLeafs();
+            singleG = new Fraction((rT - rTt), count);
+            singleG = singleG.Divide(t1t - 1);
+            if (singleG < minG)
             {
-                if (singleG > minG)
-                    minG = singleG;
-            }
-            tree.g = singleG;
+                minG = singleG;
+            }                
+            g = singleG;
 
-            if (tree.leftChild != null)
-                CalculateG(tree.leftChild, count, ref minG);
-            if (tree.rightChild != null)
-                CalculateG(tree.rightChild, count, ref minG);
+            if (!leftChild.isTerminate)
+                leftChild.CalculateG(count, ref minG);
+            if (!rightChild.isTerminate)
+                rightChild.CalculateG(count, ref minG);
         }
 
-        private double CalculateError(Tree tree, int count)
-        {
-            
+        private int CalculateError()
+        {            
             int k = 0;
             var prevailClass = LearningData.Instance.FindPrevailClass(indexesOfData);
+            //!!!!!!!!!!!!! надо просто count - количество элементов выбранного класса
             for (int i = 0; i < indexesOfData.Length; i++)
             {
                 if (!LearningData.Instance.instances[indexesOfData[i]].instanceClass.Equals(prevailClass))
                     k++;
             }
 
-            return (double) k/count;
+            return k;
         }
 
-        private double CalculateErrorOfBranch(Tree tree, int count)
+        private int CalculateErrorOfBranch()
         {
-            double totalError = 0;
+            int totalError = 0;
 
-            if (tree.isTerminate)
-                totalError += CalculateError(tree, count);
+            if (isTerminate)
+                totalError += CalculateError();
             else
             {
-                totalError += CalculateErrorOfBranch(tree.leftChild, count);
-                totalError += CalculateErrorOfBranch(tree.rightChild, count);
+                totalError += leftChild.CalculateErrorOfBranch();
+                totalError += rightChild.CalculateErrorOfBranch();
             }
 
             return totalError;
         }
 
-        private int FindCountOfLeafs(Tree tree)
+        private int FindCountOfLeafs()
         {
             var finaleCount = 0;
 
@@ -92,32 +94,24 @@ namespace CART_probe
                 return 1;
             else
             {
-                finaleCount += FindCountOfLeafs(leftChild);
-                finaleCount += FindCountOfLeafs(rightChild);
+                finaleCount += leftChild.FindCountOfLeafs();
+                finaleCount += rightChild.FindCountOfLeafs();
                 return finaleCount;
             }
         }
 
-        private bool Cutting(double minG, double rootG)
+        private void Cutting(Fraction minG)
         {
-            if (g == rootG)
-                return true;
+            if (g == minG)
+            {
+                isTerminate = true;
+            }
             else
             {
-                if (g == minG)
-                {
-                    leftChild = null;
-                    rightChild = null;
-                    isTerminate = true;
-                }
-                else
-                {
-                    if (leftChild != null && !leftChild.isTerminate)
-                        leftChild.Cutting(minG, rootG);
-                    if (rightChild != null && !rightChild.isTerminate)
-                        rightChild.Cutting(minG, rootG);
-                }
-                return false;
+                if (!leftChild.isTerminate)
+                    leftChild.Cutting(minG);
+                if (!rightChild.isTerminate)
+                    rightChild.Cutting(minG);
             }
         }
     }

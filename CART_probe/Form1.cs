@@ -35,11 +35,6 @@ namespace CART_probe
             DisplayTree display_tree = new DisplayTree(finalTree);
             alfa = finalTree.FindAlfa();
             textBox1.SelectionStart = 0;
-            Fraction a = new Fraction(1000, 104);
-            Fraction b = new Fraction(5, 52);
-            a = a.Divide(5);
-            var result2 = a == b;
-
         }
     }
 }

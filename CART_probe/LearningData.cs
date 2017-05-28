@@ -290,5 +290,22 @@ namespace CART_probe
             var finalIndex = Array.IndexOf(classesIndexes ,classesIndexes.Max());
             return classes[finalIndex];
         }
+
+        // Возвращает порции примеров исходного множества
+        public int[,] MakePortionsOfIndexes(int portionNumbers)
+        {
+            int step = instances.Count / portionNumbers;
+
+            int[,] result = new int[portionNumbers, step + 1];
+
+            for (int i = 0; i < portionNumbers; i++)
+            {
+                for (int j = 0, index = i; index < instances.Count; j++, index += portionNumbers)
+                {
+                    result[i, j] = index;
+                }
+            }
+            return result;
+        }
     }
 }

@@ -22,7 +22,6 @@ namespace CART_probe
         List<Fraction> beta = new List<Fraction>();
         List<Fraction> errForBeta = new List<Fraction>();
         int minErrIndex;
-        List<Fraction> alfa = new List<Fraction>();
         Tree finalTree;
 
         public Form1()
@@ -37,12 +36,7 @@ namespace CART_probe
             data = new LearningData(path1, classes1, atributes1);
             var used = new List<int>(data.GetCountOfRules());
             finalTree = data.CART(null);
-            DisplayTree display_tree = new DisplayTree(finalTree);
-            alfa = finalTree.FindAlfa();
-
             //здеся наверно должн быть вызов DisplayAlpha
-
-            Tree finalTree = data.CART(null/*, used*/);
             //DisplayTree display_tree = new DisplayTree(finalTree);
             alfaOrigin = finalTree.FindAlfa();
             beta.Add(new Fraction(0));
@@ -80,10 +74,6 @@ namespace CART_probe
                         errForBeta[i] += err[i];
                     }
                 }
-                //var caInt = finalTree.CalculateError(indexOfData.ToArray());
-                //var ca = new Fraction(caInt, indexOfData.Count);
-                //ca = ca.Add(beta[0]);
-                //finalTree.OpenTree(data, indexOfData.ToArray(), beta[0], ca, indexOfData.Count);
             }
             var minErr = errForBeta[0];
             minErrIndex = 0;
@@ -108,6 +98,7 @@ namespace CART_probe
 
         private void button1_Click(object sender, EventArgs e)
         {
+            DisplayAlpha(classes1);
             //finalTree.FUNKCIA(numericUpDown1.Value);
         }
     }

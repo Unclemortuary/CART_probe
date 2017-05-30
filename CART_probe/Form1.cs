@@ -19,6 +19,7 @@ namespace CART_probe
         string[] classes1;
         string path1 = @"car.txt";
         List<Fraction> alfa = new List<Fraction>();
+        Tree finalTree;
 
         public Form1()
         {
@@ -31,10 +32,25 @@ namespace CART_probe
         {
             data = new LearningData(path1, classes1, atributes1);
             var used = new List<int>(data.GetCountOfRules());
-            Tree finalTree = data.CART(null/*, used*/);
+            finalTree = data.CART(null);
             DisplayTree display_tree = new DisplayTree(finalTree);
             alfa = finalTree.FindAlfa();
+
+            //здеся наверно должн быть вызов DisplayAlpha
+
             textBox1.SelectionStart = 0;
+        }
+
+        private void DisplayAlpha(string[] array)
+        {
+            for (int i = 0; i < array.Length; i++)
+                textBox1.Text += "1 - " + array[i] + "     ";
+            numericUpDown1.Maximum = array.Length;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            //finalTree.FUNKCIA(numericUpDown1.Value);
         }
     }
 }

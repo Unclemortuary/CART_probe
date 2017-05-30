@@ -13,9 +13,9 @@ namespace CART_probe
 
         
         public List<Instance> instances;
-        private RulesForData rulesForData;
+        public RulesForData rulesForData;
         private List<int> usedRules = new List<int>();
-        private string[] atributes;
+        public string[] atributes;
         private string[] classes;
         
 
@@ -292,20 +292,22 @@ namespace CART_probe
         }
 
         // Возвращает порции примеров исходного множества
-        public int[,] MakePortionsOfIndexes(int portionNumbers)
+        public List<int[]> MakePortionsOfIndexes(int portionNumbers)
         {
             int step = instances.Count / portionNumbers;
-
-            int[,] result = new int[portionNumbers, step + 1];
+            var listResult = new List<int[]>();
+            //int[,] result = new int[portionNumbers, step + 1];
 
             for (int i = 0; i < portionNumbers; i++)
             {
+                var result = new int[step + 1];
                 for (int j = 0, index = i; index < instances.Count; j++, index += portionNumbers)
                 {
-                    result[i, j] = index;
+                    result[j] = index;
                 }
+                listResult.Add(result);
             }
-            return result;
+            return listResult;
         }
     }
 }

@@ -15,12 +15,13 @@ namespace CART_probe
         public Tree rightChild;
         public bool isTerminate;
 
-        private int[] indexesOfData;
+        //private int[] indexesOfData;
+        private List<int> indexesOfData;
         private Fraction g;
 
         public Tree(int[] data)
         {
-            indexesOfData = data;
+            indexesOfData = new List<int>(data);
         }
 
         public List<Fraction> FindAlfa()
@@ -28,12 +29,54 @@ namespace CART_probe
             List<Fraction> alfa = new List<Fraction>();
             while (!isTerminate)
             {
-                Fraction minG = new Fraction (Double.MaxValue);
-                CalculateG(indexesOfData.Length, ref minG);
+                Fraction minG = new Fraction(Double.MaxValue);
+                CalculateG(indexesOfData.Count, ref minG);
                 Cutting(minG);
                 alfa.Add(minG);
-            } 
+            }
             return alfa;
+        }
+        public List<Fraction> FindErrForBeta(int[] indexes, List<Fraction> beta)
+        {
+            if (indexes.Last() == 0)
+            {
+                Array.Resize(ref indexes, indexes.Length - 1);
+            }
+            List<Fraction> alfa = new List<Fraction>();
+            List<Fraction> errAlfa = new List<Fraction>();
+            while (!isTerminate)
+            {
+                Fraction minG = new Fraction(Double.MaxValue);
+                CalculateG(indexesOfData.Count, ref minG);
+                if(alfa.Count == 0 && minG > 0)
+                {
+                    errAlfa.Add(new Fraction(0));
+                }
+                Cutting(minG);
+                alfa.Add(minG);
+                //!!!!!можно считать ошибку только для нужных нам деревьев
+                var rt = ErrorGi(indexes);
+                errAlfa.Add(new Fraction(rt, indexes.Length));
+            }
+            List<Fraction> errForBeta = new List<Fraction>();
+            //int[] errForBeta = new int[beta.Count];
+            int cnt = 0;
+            for (int i = 0; i < beta.Count; i++)
+            {
+                if (beta[i] >= alfa.Last())
+                {
+                    errForBeta.Add(errAlfa.Last());
+                }
+                else
+                {
+                    while (!(beta[i] >= alfa[cnt] && beta[i] < alfa[cnt + 1]))
+                    {
+                        cnt++;
+                    }
+                    errForBeta.Add(errAlfa[cnt]);
+                }
+            }
+            return errForBeta;
         }
         
         private void CalculateG(int count, ref Fraction minG)
@@ -60,9 +103,9 @@ namespace CART_probe
         private int CalculateError()
         {            
             int k = 0;
-            var prevailClass = LearningData.Instance.FindPrevailClass(indexesOfData);
+            var prevailClass = LearningData.Instance.FindPrevailClass(indexesOfData.ToArray());
             //!!!!!!!!!!!!! надо просто count - количество элементов выбранного класса
-            for (int i = 0; i < indexesOfData.Length; i++)
+            for (int i = 0; i < indexesOfData.Count; i++)
             {
                 if (!LearningData.Instance.instances[indexesOfData[i]].instanceClass.Equals(prevailClass))
                     k++;
@@ -113,6 +156,73 @@ namespace CART_probe
                 if (!rightChild.isTerminate)
                     rightChild.Cutting(minG);
             }
+        }
+
+        public void OpenTreeAndFill(List<int> indexes)
+        {
+            indexesOfData = indexes;
+            if (leftChild == null && rightChild == null)
+            {
+                isTerminate = true;                
+            }
+            else
+            {
+                isTerminate = false;
+                //разбиение примеров по правилу
+                List<int> indexesOfLeftInstances = new List<int>();
+                List<int> indexesOfRightInstances = new List<int>();
+                for (int i = 0, ind = Array.IndexOf(LearningData.Instance.atributes, rule.b[0].atrName); i < indexes.Count(); i++)
+                {
+                    for (int j = 0; j < rule.b.Count; j++)
+                    {
+                        if (LearningData.Instance.instances[indexes[i]].atributes[ind].Equals(rule.b[j]))
+                            indexesOfLeftInstances.Add(indexes[i]);
+                    }
+                    //!!!!!намного оптимальнее поставить флаг
+                    if (!indexesOfLeftInstances.Contains(indexes[i]))
+                        indexesOfRightInstances.Add(indexes[i]);
+                }
+                if (leftChild != null)
+                {
+                    leftChild.OpenTreeAndFill(indexesOfLeftInstances);
+                }
+                if(rightChild != null)
+                {
+                    rightChild.OpenTreeAndFill(indexesOfRightInstances);
+                }
+            }
+        }
+        private int ErrorGi(int[] indexes)
+        {
+            int k = 0;
+            if (isTerminate)
+            {                
+                var prevailClass = LearningData.Instance.FindPrevailClass(indexesOfData.ToArray());
+                for (int i = 0; i < indexes.Length; i++)
+                {
+                    if (!LearningData.Instance.instances[indexes[i]].instanceClass.Equals(prevailClass))
+                        k++;
+                }                
+            }
+            else
+            {
+                List<int> indexesOfLeftInstances = new List<int>();
+                List<int> indexesOfRightInstances = new List<int>();
+                for (int i = 0, ind = Array.IndexOf(LearningData.Instance.atributes, rule.b[0].atrName); i < indexes.Count(); i++)
+                {
+                    for (int j = 0; j < rule.b.Count; j++)
+                    {
+                        if (LearningData.Instance.instances[indexes[i]].atributes[ind].Equals(rule.b[j]))
+                            indexesOfLeftInstances.Add(indexes[i]);
+                    }
+                    //!!!!!намного оптимальнее поставить флаг
+                    if (!indexesOfLeftInstances.Contains(indexes[i]))
+                        indexesOfRightInstances.Add(indexes[i]);
+                }
+                k += leftChild.ErrorGi(indexesOfLeftInstances.ToArray());
+                k += rightChild.ErrorGi(indexesOfRightInstances.ToArray());
+            }
+            return k;
         }
     }
 }

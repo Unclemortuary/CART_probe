@@ -36,9 +36,9 @@ namespace CART_probe
             data = new LearningData(path1, classes1, atributes1);
             var used = new List<int>(data.GetCountOfRules());
             finalTree = data.CART(null);
-            //здеся наверно должн быть вызов DisplayAlpha
-            //DisplayTree display_tree = new DisplayTree(finalTree);
+            DisplayTree display_tree = new DisplayTree(finalTree, 0);
             alfaOrigin = finalTree.FindAlfa();
+            DisplayAlpha(alfaOrigin);
             beta.Add(new Fraction(0));
             for (int i = 0; i < alfaOrigin.Count - 1; i++)
             {
@@ -89,16 +89,17 @@ namespace CART_probe
             textBox1.SelectionStart = 0;
         }
 
-        private void DisplayAlpha(string[] array)
+        private void DisplayAlpha(List<Fraction> array)
         {
-            for (int i = 0; i < array.Length; i++)
-                textBox1.Text += "1 - " + array[i] + "     ";
-            numericUpDown1.Maximum = array.Length;
+            for (int i = 0; i < array.Count; i++)
+                textBox1.Text += i + " - " + array[i].ToString() + " \r\n";
+            numericUpDown1.Maximum = array.Count;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            DisplayAlpha(classes1);
+            finalTree.CutForAlfa(alfaOrigin[Decimal.ToInt32(numericUpDown1.Value)]);
+            DisplayTree display_tree = new DisplayTree(finalTree, Decimal.ToInt32(numericUpDown1.Value));
             //finalTree.FUNKCIA(numericUpDown1.Value);
         }
     }

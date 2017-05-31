@@ -224,5 +224,23 @@ namespace CART_probe
             }
             return k;
         }
+
+        public void CutForAlfa(Fraction alfa)
+        {
+            int[] indexes = new int[LearningData.Instance.instances.Count];
+            for (int q = 0; q < indexes.Length; q++)
+                indexes[q] = q;
+
+            OpenTreeAndFill(indexes.ToList());
+            var min = new Fraction();
+            while (!isTerminate && min != alfa)
+            {
+                Fraction minG = new Fraction(Double.MaxValue);
+                CalculateG(indexesOfData.Count, ref minG);
+                Cutting(minG);
+                min = minG;
+            }
+        }
+      
     }
 }

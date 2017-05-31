@@ -15,19 +15,19 @@ namespace CART_probe
         private Tree tree;
 
 
-        public DisplayTree(Tree tr)
+        public DisplayTree(Tree tr, int nm)
         {
             NumberTree = 1;
             contacts = new List<string>();
             tree = tr;
-            PrintTGF(tree);
+            PrintTGF(tree, nm);
         }
 
-        private void PrintTGF(Tree tr)
+        private void PrintTGF(Tree tr, int nm)
         {
             try
             {
-                writer = new StreamWriter("graph.tgf");
+                writer = new StreamWriter("graph_" + nm + ".tgf");
                 Walk(tr, NumberTree);
                 writer.WriteLine("#");
                 for (int i = 0; i < contacts.Count; i++)
@@ -45,7 +45,7 @@ namespace CART_probe
         private void Walk(Tree tree, int nmb)
         {
             int trL, trR;
-            if (tree.rightChild != null)
+            if (tree.rightChild != null && !tree.isTerminate)
             {
                 trR = NumberTree + 1;
                 NumberTree += 1;
@@ -55,7 +55,7 @@ namespace CART_probe
             {
                 trR = 0;
             }
-            if (tree.leftChild != null)
+            if (tree.leftChild != null && !tree.isTerminate)
             {
                 trL = NumberTree + 1;
                 NumberTree += 1;

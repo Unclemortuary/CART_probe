@@ -22,7 +22,6 @@ namespace CART_probe
         List<Fraction> beta = new List<Fraction>();
         List<Fraction> errForBeta = new List<Fraction>();
         int minErrIndex;
-        List<Fraction> alfa = new List<Fraction>();
         Tree finalTree;
 
         public Form1()
@@ -37,14 +36,9 @@ namespace CART_probe
             data = new LearningData(path1, classes1, atributes1);
             var used = new List<int>(data.GetCountOfRules());
             finalTree = data.CART(null);
-            DisplayTree display_tree = new DisplayTree(finalTree);
-            alfa = finalTree.FindAlfa();
-
-            //здеся наверно должн быть вызов DisplayAlpha
-
-            Tree finalTree = data.CART(null/*, used*/);
-            //DisplayTree display_tree = new DisplayTree(finalTree);
+            DisplayTree display_tree = new DisplayTree(finalTree, 0);
             alfaOrigin = finalTree.FindAlfa();
+            DisplayAlpha(alfaOrigin);
             beta.Add(new Fraction(0));
             for (int i = 0; i < alfaOrigin.Count - 1; i++)
             {
@@ -67,7 +61,7 @@ namespace CART_probe
                         }
                     }                    
                 }
-                Tree finalTree.OpenTreeAndFill(indexOfData);
+                finalTree.OpenTreeAndFill(indexOfData);
                 var err = finalTree.FindErrForBeta(test[j], beta);
                 if (errForBeta.Count == 0)
                 {
@@ -80,10 +74,6 @@ namespace CART_probe
                         errForBeta[i] += err[i];
                     }
                 }
-                //var caInt = finalTree.CalculateError(indexOfData.ToArray());
-                //var ca = new Fraction(caInt, indexOfData.Count);
-                //ca = ca.Add(beta[0]);
-                //finalTree.OpenTree(data, indexOfData.ToArray(), beta[0], ca, indexOfData.Count);
             }
             var minErr = errForBeta[0];
             minErrIndex = 0;
@@ -99,15 +89,17 @@ namespace CART_probe
             textBox1.SelectionStart = 0;
         }
 
-        private void DisplayAlpha(string[] array)
+        private void DisplayAlpha(List<Fraction> array)
         {
-            for (int i = 0; i < array.Length; i++)
-                textBox1.Text += "1 - " + array[i] + "     ";
-            numericUpDown1.Maximum = array.Length;
+            for (int i = 0; i < array.Count; i++)
+                textBox1.Text += i + " - " + array[i].ToString() + " \r\n";
+            numericUpDown1.Maximum = array.Count;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+            finalTree.CutForAlfa(alfaOrigin[Decimal.ToInt32(numericUpDown1.Value)]);
+            DisplayTree display_tree = new DisplayTree(finalTree, Decimal.ToInt32(numericUpDown1.Value));
             //finalTree.FUNKCIA(numericUpDown1.Value);
         }
     }

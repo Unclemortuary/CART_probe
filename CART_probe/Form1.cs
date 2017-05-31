@@ -33,6 +33,7 @@ namespace CART_probe
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            
             data = new LearningData(path1, classes1, atributes1);
             var used = new List<int>(data.GetCountOfRules());
             finalTree = data.CART(null);
@@ -91,8 +92,12 @@ namespace CART_probe
 
         private void DisplayAlpha(List<Fraction> array)
         {
-            for (int i = 0; i < array.Count; i++)
-                textBox1.Text += i + " - " + array[i].ToString() + " \r\n";
+            for (int i = 0, j = 0; i < array.Count; i++, j++)
+            {
+                textBox1.Text += (i + 1) + " - " + array[i].ToString() + "     ";
+
+            }
+                
             numericUpDown1.Maximum = array.Count;
         }
 
@@ -100,7 +105,6 @@ namespace CART_probe
         {
             finalTree.CutForAlfa(alfaOrigin[Decimal.ToInt32(numericUpDown1.Value)]);
             DisplayTree display_tree = new DisplayTree(finalTree, Decimal.ToInt32(numericUpDown1.Value));
-            //finalTree.FUNKCIA(numericUpDown1.Value);
         }
     }
 }

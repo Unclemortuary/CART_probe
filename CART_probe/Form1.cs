@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -19,6 +20,10 @@ namespace CART_probe
         string[] classes1;
         string path1 = @"car.txt";
         List<Fraction> alfaOrigin = new List<Fraction>();
+        List<Fraction> errorTreeForAlfa = new List<Fraction>();
+        List<int> CountOfLeafs = new List<int>();
+        List<int> depth = new List<int>();
+
         List<Fraction> beta = new List<Fraction>();
         List<Fraction> errForBeta = new List<Fraction>();
         int minErrIndex;
@@ -38,17 +43,27 @@ namespace CART_probe
             var used = new List<int>(data.GetCountOfRules());
             finalTree = data.CART(null);
             DisplayTree display_tree = new DisplayTree(finalTree, 0);
-            alfaOrigin = finalTree.FindAlfa();
+            alfaOrigin = finalTree.FindAlfa(ref errorTreeForAlfa, ref CountOfLeafs, ref depth);
             DisplayAlpha(alfaOrigin);
+            display_tree.Graph(alfaOrigin, errorTreeForAlfa, CountOfLeafs);
+            // нахождение бета
             beta.Add(new Fraction(0));
             for (int i = 0; i < alfaOrigin.Count - 1; i++)
             {
                 beta.Add(new Fraction(Math.Sqrt(alfaOrigin[i].Multiply(alfaOrigin[i + 1]).ToDouble())));
             }
             textBox1.SelectionStart = 0;
+            //int[] indexes = new int[data.instances.Count];            
+            //indexes = new int[data.instances.Count];
+            //for (int q = 0; q < indexes.Length; q++)
+            //    indexes[q] = q;
+            //errorTreeForAlfa = finalTree.FindErrorForALfaS(indexes, alfaOrigin);
+            //разбиение выбоки
             var test = data.MakePortionsOfIndexes(10);
+            //проход по всем Gi
             for (int j = 0; j < test.Count; j++)
             {
+
                 List<int> indexOfData = new List<int>();
                 for (int i = 0; i < test.Count; i++)
                 {
@@ -62,7 +77,9 @@ namespace CART_probe
                         }
                     }                    
                 }
+                //открытие веток и распределение выборки по дереву
                 finalTree.OpenTreeAndFill(indexOfData);
+                //ошибка классификации для заданного бета, и выборки
                 var err = finalTree.FindErrForBeta(test[j], beta);
                 if (errForBeta.Count == 0)
                 {
@@ -76,6 +93,7 @@ namespace CART_probe
                     }
                 }
             }
+            //нахождение минимальной ошибки
             var minErr = errForBeta[0];
             minErrIndex = 0;
             for (int i = 1; i < errForBeta.Count; i++)
@@ -92,13 +110,21 @@ namespace CART_probe
 
         private void DisplayAlpha(List<Fraction> array)
         {
+            textBox1.Text += "i       alfa          error          |T|       Глубина     Ca(T)\r\n";
             for (int i = 0, j = 0; i < array.Count; i++, j++)
             {
-                textBox1.Text += (i + 1) + " - " + array[i].ToString() + "     ";
+                var str = array[i].ToDouble().ToString();
+                if (str.Length > 7)
+                    str = str.Substring(0, 7);
+                var str2 = errorTreeForAlfa[i].ToDouble().ToString();
+                if (str2.Length > 7)
+                    str2 = str2.Substring(0, 7);
+                var C = errorTreeForAlfa[i].Add(array[i].Multiply(CountOfLeafs[i]));
+                textBox1.Text += (i) + " - " + str + "     " + str2 + "     " + CountOfLeafs[i].ToString() + "     " + depth[i].ToString() + "         " + C.ToDouble().ToString() + "\r\n";
 
             }
                 
-            numericUpDown1.Maximum = array.Count;
+            numericUpDown1.Maximum = array.Count - 1;
         }
 
         private void button1_Click(object sender, EventArgs e)

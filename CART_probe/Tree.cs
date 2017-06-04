@@ -24,14 +24,21 @@ namespace CART_probe
             indexesOfData = new List<int>(data);
         }
 
-        public List<Fraction> FindAlfa()
+        public List<Fraction> FindAlfa(ref List<Fraction> error, ref List<int> cntList, ref List<int> depth)
         {
             List<Fraction> alfa = new List<Fraction>();
+            alfa.Add(0);
+            error.Add(new Fraction(CalculateErrorOfBranch(), indexesOfData.Count));
+            cntList.Add(FindCountOfLeafs());
+            depth.Add(Depth());
             while (!isTerminate)
             {
                 Fraction minG = new Fraction(Double.MaxValue);
                 CalculateG(indexesOfData.Count, ref minG);
                 Cutting(minG);
+                error.Add(new Fraction(CalculateErrorOfBranch(), indexesOfData.Count));
+                cntList.Add(FindCountOfLeafs());
+                depth.Add(Depth());
                 alfa.Add(minG);
             }
             return alfa;
@@ -192,6 +199,7 @@ namespace CART_probe
                 }
             }
         }
+        //дерево обрезано и учебные примеры раскинуты. и считается ошибка для тестовой выборки.
         private int ErrorGi(int[] indexes)
         {
             int k = 0;
@@ -225,6 +233,7 @@ namespace CART_probe
             return k;
         }
 
+        //обрезка для выведения дерева
         public void CutForAlfa(Fraction alfa)
         {
             int[] indexes = new int[LearningData.Instance.instances.Count];
@@ -241,6 +250,27 @@ namespace CART_probe
                 min = minG;
             }
         }
-      
+        public int Depth()
+        {
+            if (isTerminate)
+                return 1;
+            else
+            {
+                var l = leftChild.Depth();
+                var r = rightChild.Depth();
+                if (l > r)
+                    return 1 + l;
+                else
+                    return 1 + r;
+            }
+        }
+        //public List<Fraction> FindErrorForALfaS(int[] indexes, List<Fraction> alfas)
+        //{
+        //    OpenTreeAndFill(indexes.ToList());
+        //    List<Fraction> errorTreeForAlfa = new List<Fraction>();
+        //    var err = FindErrForBeta(indexes, alfas);
+        //    return errorTreeForAlfa;
+        //}
+
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using Fractions;
 
 namespace CART_probe
 {
@@ -75,6 +76,33 @@ namespace CART_probe
             {
                 Walk(tree.rightChild, trR);
             }
+        }
+        public void Graph(List<Fraction> alfaOrigin, List<Fraction> errorTreeForAlfa, List<int> CountOfLeafs)
+        {
+            try
+            {
+                StreamWriter writer = new StreamWriter("err_ot_alfa.txt");
+                for(int i = 0; i < alfaOrigin.Count; i++)
+                {
+                    writer.WriteLine(alfaOrigin[i].ToDouble().ToString() + " " + errorTreeForAlfa[i].ToDouble().ToString());
+                }
+                writer.Close();
+                writer = new StreamWriter("T_ot_alfa.txt");
+                StreamWriter writer2 = new StreamWriter("T_normir_ot_alfa.txt");
+                for (int i = 0; i < alfaOrigin.Count; i++)
+                {
+                    writer.WriteLine(alfaOrigin[i].ToDouble().ToString() + " " + CountOfLeafs[i].ToString());
+                    double x = (double)CountOfLeafs[i] / (double)CountOfLeafs[0];
+                    writer2.WriteLine(alfaOrigin[i].ToDouble().ToString() + " " + x.ToString());
+                }
+                writer.Close();
+                writer2.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception was occure : {0}", e);
+            }
+            Console.WriteLine("Done!");
         }
     }
 

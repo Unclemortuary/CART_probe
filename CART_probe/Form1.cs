@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Diagnostics;
 using Fractions;
 
 
@@ -23,6 +24,7 @@ namespace CART_probe
         List<Fraction> errorTreeForAlfa = new List<Fraction>();
         List<int> CountOfLeafs = new List<int>();
         List<int> depth = new List<int>();
+        Stopwatch stopwatch;
 
         List<Fraction> beta = new List<Fraction>();
         List<Fraction> errForBeta = new List<Fraction>();
@@ -38,26 +40,35 @@ namespace CART_probe
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            
+            stopwatch = new Stopwatch();   
             data = new LearningData(path1, classes1, atributes1);
             var used = new List<int>(data.GetCountOfRules());
+
+            stopwatch.Start();
             finalTree = data.CART(null);
+            stopwatch.Stop();
+            Console.WriteLine("Time of building is " + stopwatch.Elapsed.Milliseconds);
+            stopwatch.Reset();
+
             DisplayTree display_tree = new DisplayTree(finalTree, 0);
+            stopwatch.Start();
             alfaOrigin = finalTree.FindAlfa(ref errorTreeForAlfa, ref CountOfLeafs, ref depth);
+            stopwatch.Stop();
+            Console.WriteLine("Time of cutting is " + stopwatch.Elapsed.Milliseconds);
+            stopwatch.Reset();
+
             DisplayAlpha(alfaOrigin);
             display_tree.Graph(alfaOrigin, errorTreeForAlfa, CountOfLeafs);
             // нахождение бета
+
+            stopwatch.Start();
             beta.Add(new Fraction(0));
             for (int i = 0; i < alfaOrigin.Count - 1; i++)
             {
                 beta.Add(new Fraction(Math.Sqrt(alfaOrigin[i].Multiply(alfaOrigin[i + 1]).ToDouble())));
             }
             textBox1.SelectionStart = 0;
-            //int[] indexes = new int[data.instances.Count];            
-            //indexes = new int[data.instances.Count];
-            //for (int q = 0; q < indexes.Length; q++)
-            //    indexes[q] = q;
-            //errorTreeForAlfa = finalTree.FindErrorForALfaS(indexes, alfaOrigin);
+
             //разбиение выбоки
             var test = data.MakePortionsOfIndexes(10);
             //проход по всем Gi
@@ -104,6 +115,9 @@ namespace CART_probe
                     minErrIndex = i;
                 }
             }
+            stopwatch.Stop();
+            Console.WriteLine("Time of cross-validation is " + stopwatch.Elapsed.Milliseconds);
+            stopwatch.Reset();
 
             textBox1.SelectionStart = 0;
         }

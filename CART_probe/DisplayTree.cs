@@ -67,7 +67,7 @@ namespace CART_probe
                 trL = 0;
             }
 
-            writer.WriteLine(nmb.ToString() + " " + tree.rule.rule);
+            writer.WriteLine(nmb.ToString() + " " + "<html>" + tree.rule.rule + "<br>(" + tree.ReturnCountOfAllClasses() + ")</html>");
             if(trL != 0)
             {
                 Walk(tree.leftChild, trL);
@@ -89,14 +89,33 @@ namespace CART_probe
                 writer.Close();
                 writer = new StreamWriter("T_ot_alfa.txt");
                 StreamWriter writer2 = new StreamWriter("T_normir_ot_alfa.txt");
+                StreamWriter writerDifErr = new StreamWriter("dif_err.txt");
+                StreamWriter writerDifList = new StreamWriter("dif_list.txt");
                 for (int i = 0; i < alfaOrigin.Count; i++)
                 {
                     writer.WriteLine(alfaOrigin[i].ToDouble().ToString() + " " + CountOfLeafs[i].ToString());
                     double x = (double)CountOfLeafs[i] / (double)CountOfLeafs[0];
+                    
                     writer2.WriteLine(alfaOrigin[i].ToDouble().ToString() + " " + x.ToString());
+                    if (i == 0)
+                    {
+                        writerDifErr.WriteLine(alfaOrigin[i].ToDouble().ToString() + " " + "0");
+                        writerDifList.WriteLine(alfaOrigin[i].ToDouble().ToString() + " " + "0");
+                    }
+                    else
+                    {
+                        writerDifErr.WriteLine(alfaOrigin[i - 1].ToDouble().ToString() + " " + ((errorTreeForAlfa[i] - errorTreeForAlfa[i - 1]) / (alfaOrigin[i] - alfaOrigin[i - 1])).ToDouble().ToString());
+                        writerDifErr.WriteLine(alfaOrigin[i].ToDouble().ToString() + " " + ((errorTreeForAlfa[i] - errorTreeForAlfa[i - 1]) / (alfaOrigin[i] - alfaOrigin[i - 1])).ToDouble().ToString());
+                        double x_pred = (double)CountOfLeafs[i - 1] / (double)CountOfLeafs[0];
+                        writerDifList.WriteLine(alfaOrigin[i - 1].ToDouble().ToString() + " " + ((x_pred-x) / (alfaOrigin[i] - alfaOrigin[i - 1]).ToDouble()).ToString());
+                        writerDifList.WriteLine(alfaOrigin[i].ToDouble().ToString() + " " + ((x_pred-x) / (alfaOrigin[i] - alfaOrigin[i - 1]).ToDouble()).ToString());
+                    }
+
                 }
                 writer.Close();
                 writer2.Close();
+                writerDifErr.Close();
+                writerDifList.Close();
             }
             catch (Exception e)
             {

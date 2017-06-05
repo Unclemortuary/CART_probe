@@ -86,7 +86,6 @@ namespace CART_probe
             {
                 Console.WriteLine("Exception was occure : {0}", e);
             }
-            Console.WriteLine("Done!");
         }
 
         public int GetCountOfRules()
@@ -278,17 +277,37 @@ namespace CART_probe
             return true;
         }
 
+        //Находит преобладающий класс
         public string FindPrevailClass(int[] indexes)
         {
             //!!!!надо при построении эти значения запоминать, а не занаво считать
-            int[] classesIndexes = new int[classes.Count()];
-            for (int i = 0; i < indexes.Count(); i++)
+            int[] classesIndexes = new int[classes.Length];
+            for (int i = 0; i < indexes.Length; i++)
             {
                 var index = Array.IndexOf(classes, instances[indexes[i]].instanceClass);
                 classesIndexes[index]++;
             }
             var finalIndex = Array.IndexOf(classesIndexes ,classesIndexes.Max());
             return classes[finalIndex];
+        }
+
+        public string FindCountOfAllClasses(int[] indexes)
+        {
+            int[] result = new int[classes.Length];
+            string resultString = null;
+            for (int i = 0; i < indexes.Length; i++)
+            {
+                var classOfInstance = instances[indexes[i]].instanceClass;
+                var index = Array.IndexOf(classes, classOfInstance);
+                result[index]++;
+            }
+
+            for (int i = 0; i < result.Length; i++)
+            {
+                resultString += classes[i] + " is " + result[i].ToString() + " ";
+            }
+
+            return resultString;
         }
 
         // Возвращает порции примеров исходного множества

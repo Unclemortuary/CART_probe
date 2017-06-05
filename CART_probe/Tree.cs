@@ -233,6 +233,11 @@ namespace CART_probe
             return k;
         }
 
+        public string ReturnCountOfAllClasses()
+        {
+            return LearningData.Instance.FindCountOfAllClasses(indexesOfData.ToArray());
+        }
+
         //обрезка для выведения дерева
         public void CutForAlfa(Fraction alfa)
         {
